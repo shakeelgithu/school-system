@@ -1,0 +1,33 @@
+<div class="auth-container">
+    <div class="auth-card">
+      <div class="icon-container">
+        <i class="fa fa-user-circle"></i>
+      </div>
+      <form (ngSubmit)="onSubmit()">
+  <input type="email" [(ngModel)]="email" name="email" placeholder="Enter Email" required />
+  <input type="password" [(ngModel)]="password" name="password" placeholder="Enter Password" required />
+  <div class="auth-actions">
+    <label><input type="checkbox" /> Remember me</label>
+    <a routerLink="/auth/forgot-password">Forgot Password?</a>
+  </div>
+  <button type="submit">Login</button>
+</form>
+
+  
+      <div class="auth-actions" style="justify-content: center; margin-top: 1rem;">
+        <p>Don't have an account? <a routerLink="/auth/signup">Signup</a></p>
+      </div>
+  
+      <div class="social-login">
+        <p>Or Login With</p>
+        <div class="icons">
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-google-plus-g"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin-in"></i>
+          </div>
+      </div>
+    </div>
+  </div>
+  
