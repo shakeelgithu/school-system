@@ -1,0 +1,197 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: white;
+  border-bottom: 1px solid #e9ecef;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .search-container {
+    position: relative;
+
+    .search-input {
+      background-color: #f6f7fb;
+      border: none;
+      padding: 10px 15px;
+      padding-right: 40px;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 200px;
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(61, 124, 244, 0.2);
+      }
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 5px;
+    }
+  }
+
+  .header-middle {
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+
+    .date-info {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .value {
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .academic-year {
+      background-color: #f6f7fb;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      .label {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .value {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      i {
+        font-size: 12px;
+        color: #6c757d;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+
+      .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background-color: #f6f7fb;
+        border: none;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          background-color: #e9ecef;
+        }
+
+        .badge {
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          background-color: #ff5c5c;
+          color: white;
+          font-size: 10px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+
+    .profile-mini {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}
+.dashboard {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+  
+}
+.breadcrumbs {
+  font-size: 14px;
+  color: #6c757d;
+  background-color: white;
+
+  i {
+    margin: 0 8px;
+    font-size: 12px;
+  }
+}
+
+// Icons placeholder - replace with your icon system
+.icon-search,
+.icon-bell,
+.icon-mail,
+.icon-settings,
+.icon-maximize,
+.icon-chevron-down,
+.icon-chevron-right {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
