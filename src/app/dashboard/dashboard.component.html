@@ -73,6 +73,8 @@
           </div>
 
           <!-- Classes Section -->
+          <div class="page-wrapper">
+
           <div class="classes-section">
             <div class="section-header">
               <h3>Today's Class</h3>
@@ -96,6 +98,7 @@
                 <div class="class-name">{{ class.class }}</div>
               </div>
             </div>
+          </div>
           </div>
         </div>
 
@@ -125,6 +128,354 @@
               }"
             >
               {{ day.date }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- school-dashboard.component.html -->
+      <div class="dashboard-container">
+        <div class="dashboard-grid">
+          <!-- Attendance Section -->
+          <div class="card attendance-card">
+            <div class="card-header">
+              <h2 class="card-title">Attendance</h2>
+              <div class="dropdown">
+                <span class="icon">📅</span>
+                <span>This Month</span>
+                <span class="arrow">▼</span>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-dot present"></div>
+                <span>Present</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot absent"></div>
+                <span>Absent</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot late"></div>
+                <span>Late</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot half-day"></div>
+                <span>Half Day</span>
+              </div>
+            </div>
+
+            <!-- Week Days -->
+            <div class="week-section">
+              <div class="flexrow">
+                <div class="week-title">Last 7 Days</div>
+                <div class="week-date">14 May 2024 - 21 May 2024</div>
+              </div>
+              <div class="week-days">
+                <div class="day-badge present">M</div>
+                <div class="day-badge present">T</div>
+                <div class="day-badge present">W</div>
+                <div class="day-badge present">T</div>
+                <div class="day-badge absent">F</div>
+                <div class="day-badge holiday">S</div>
+              </div>
+            </div>
+
+            <!-- Circular Progress -->
+            <div class="progress-container">
+              <div class="circular-progress">
+                <svg viewBox="0 0 120 120" class="progress-ring">
+                  <circle cx="60" cy="60" r="45" class="progress-bg"></circle>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="45"
+                    class="progress-absent"
+                  ></circle>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="45"
+                    class="progress-present"
+                  ></circle>
+                </svg>
+                <div class="progress-text">
+                  <div class="progress-label">Attendance</div>
+                  <div class="progress-value">95%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="working-days">
+              <span class="icon">👥</span>
+              <span
+                >No of total working days
+                <span class="bold">28 Days</span></span
+              >
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-label">Present</div>
+                <div class="stat-number">25</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Absent</div>
+                <div class="stat-number">2</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Holiday</div>
+                <div class="stat-number">0</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Late</div>
+                <div class="stat-number">1</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Column -->
+          <div class="middle-column">
+            <!-- Best Performers -->
+            <div class="card performers-card">
+              <div class="card-header">
+                <h2 class="card-title">Best Performers</h2>
+                <div class="dropdown">
+                  <span class="icon">📊</span>
+                  <span>This Month</span>
+                  <span class="arrow">▼</span>
+                </div>
+              </div>
+
+              <div class="performers-list">
+                <div
+                  *ngFor="let class of classPerformances"
+                  class="performer-item"
+                >
+                  <span class="class-name">{{ class.name }}</span>
+                  <div class="progress-bar-container">
+                    <div
+                      class="progress-bar"
+                      [style.width.%]="class.percentage"
+                      [style.background-color]="class.color"
+                    >
+                      <span class="progress-text">{{ class.percentage }}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Student Progress -->
+            <div class="card progress-card">
+              <div class="card-header">
+                <h2 class="card-title">Student Progress</h2>
+                <div class="dropdown">
+                  <span class="icon">👤</span>
+                  <span>Top Performer</span>
+                  <span class="arrow">▼</span>
+                </div>
+              </div>
+
+              <div class="students-list">
+                <div *ngFor="let student of students" class="student-item">
+                  <img
+                    [src]="student.avatar"
+                    [alt]="student.name"
+                    class="student-avatar"
+                  />
+                  <div class="student-info">
+                    <div class="student-name">{{ student.name }}</div>
+                    <div class="student-class">{{ student.class }}</div>
+                  </div>
+                  <div class="student-performance">
+                    <span class="trophy-icon">🏆</span>
+                    <span
+                      class="performance-badge"
+                      [ngClass]="getBadgeClass(student.badge)"
+                    >
+                      {{ student.badge }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Events -->
+          <div class="card events-card">
+            <h2 class="card-title">Upcoming Events</h2>
+
+            <div class="events-list">
+              <div
+                *ngFor="let event of events"
+                class="event-item"
+                [ngClass]="getEventBorderClass(event.type)"
+              >
+                <div class="event-content">
+                  <div class="event-info">
+                    <div class="event-header">
+                      <span class="event-icon">{{
+                        getEventIcon(event.type)
+                      }}</span>
+                      <div class="event-details">
+                        <h3 class="event-title">{{ event.title }}</h3>
+                        <div class="event-date">
+                          <span class="icon">📅</span>
+                          <span>{{ event.date }}</span>
+                        </div>
+                        <div class="event-time">
+                          <span class="icon">🕘</span>
+                          <span>{{ event.time }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="event-avatars">
+                    <img
+                      *ngFor="let avatar of event.avatars"
+                      [src]="avatar"
+                      class="avatar"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-container">
+        <!-- Syllabus Section -->
+        <div class="section-header">
+          <h2>Syllabus / Lesson Plan</h2>
+          <div class="header-icons">
+            <span class="arrow-left">←</span>
+            <span class="dots">⋯</span>
+          </div>
+        </div>
+
+        <div class="syllabus-grid">
+          <div class="syllabus-card" *ngFor="let card of syllabusCards">
+            <div class="card-header2">{{ card.class }}</div>
+            <div class="card-content">
+              <h4>{{ card.title }}</h4>
+              <div class="progress-container">
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="card.progress"
+                    [ngClass]="'progress-' + card.progressColor"
+                  ></div>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn">
+                  <span class="icon">📅</span> Reschedule
+                </button>
+                <button class="action-btn share-btn">
+                  <span class="icon">📤</span> Share
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+          <!-- Notice Board -->
+          <div class="notice-board">
+            <div class="section-header">
+              <h3>Notice Board</h3>
+              <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="notice-list">
+              <div class="notice-item" *ngFor="let notice of noticeItems">
+                <div class="notice-icon" [ngClass]="'icon-' + notice.type">
+                  {{ notice.icon }}
+                </div>
+                <div class="notice-content">
+                  <p>{{ notice.title }}</p>
+                  <span class="notice-time">{{ notice.time }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leave Status -->
+          <div class="leave-status">
+            <div class="section-header">
+              <h3>Leave Status</h3>
+              <div class="header-controls">
+                <span>Apply Leave</span>
+                <select class="year-select">
+                  <option>📅 This Year</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="leave-tabs">
+              <button class="tab-btn active">Approval Status</button>
+              <button class="tab-btn">Holidays</button>
+            </div>
+
+            <div class="leave-list">
+              <div class="leave-item" *ngFor="let leave of leaveApplications">
+                <div class="leave-info">
+                  <h4>{{ leave.type }}</h4>
+                  <div class="leave-dates">
+                    <span>Applied: {{ leave.applied }}</span>
+                    <span>Leave: {{ leave.leave }}</span>
+                  </div>
+                </div>
+                <div
+                  class="leave-status-badge"
+                  [ngClass]="'status-' + leave.statusColor"
+                >
+                  {{ leave.status }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activities -->
+          <div class="activities">
+            <div class="section-header">
+              <h3>Activities</h3>
+              <select class="year-select">
+                <option>📅 2024 - 2025</option>
+              </select>
+            </div>
+
+            <div class="activity-tabs">
+              <button
+                *ngFor="let tab of activityTabs"
+                class="tab-btn"
+                [ngClass]="{ active: selectedTab === tab }"
+                (click)="selectTab(tab)"
+              >
+                {{ tab }}
+              </button>
+            </div>
+
+            <div class="activity-content" *ngIf="selectedTab === 'Reports'">
+              <div class="report-item" *ngFor="let report of reports">
+                <div class="report-icon">{{ report.icon }}</div>
+                <div class="report-info">
+                  <h4>{{ report.title }}</h4>
+                  <span *ngIf="report.uploadDate"
+                    >Uploaded on: {{ report.uploadDate }}</span
+                  >
+                </div>
+                <div class="report-actions">
+                  <button class="action-icon">⋯</button>
+                  <div class="black-box"></div>
+                </div>
+              </div>
+              <button class="upload-btn">Upload New Report</button>
             </div>
           </div>
         </div>
