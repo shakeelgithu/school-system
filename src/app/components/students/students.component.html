@@ -1,0 +1,212 @@
+<div class="students-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="students-content">
+    <!-- Header Component -->
+    <app-header></app-header>
+
+    <div class="main-content">
+      <!-- student-dashboard.component.html -->
+      <div class="dashboard-container">
+        <!-- Main Content -->
+        <main
+          class="main-content"
+          [class.main-content-expanded]="!isSidebarOpen"
+        >
+          <!-- Header -->
+          <header class="header">
+            <div class="header-left">
+              <button class="sidebar-toggle" (click)="toggleSidebar()">
+                <span class="hamburger"></span>
+              </button>
+              <div class="breadcrumb">
+                <span class="breadcrumb-item">Dashboard</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item active">People Modules</span>
+              </div>
+            </div>
+            <div class="header-right">
+              <button class="header-btn export-btn" (click)="exportData()">
+                📤 Export
+              </button>
+              <button class="header-btn add-btn" (click)="addStudent()">
+                ➕ Add Student
+              </button>
+            </div>
+          </header>
+
+          <!-- Content Area -->
+          <div class="content-area">
+            <div class="page-header">
+              <h1 class="page-title">Students List</h1>
+              <div class="student-stats">
+                <span class="stat-item">All Students: {{ totalStudents }}</span>
+                <span class="stat-separator">|</span>
+                <span class="stat-item active-stat"
+                  >Active Students: {{ activeStudents }}</span
+                >
+                <span class="stat-separator">|</span>
+                <span class="stat-item inactive-stat"
+                  >Inactive Students: {{ inactiveStudents }}</span
+                >
+              </div>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div class="controls-section">
+              <div class="filters-row">
+                <div class="filter-group">
+                  <label for="filter-select">Filter:</label>
+                  <select
+                    id="filter-select"
+                    class="filter-select"
+                    [(ngModel)]="selectedFilter"
+                    (change)="filterStudents(selectedFilter)"
+                  >
+                    <option value="All Students">All Students</option>
+                    <option value="Active Students">Active Students</option>
+                    <option value="Inactive Students">Inactive Students</option>
+                  </select>
+                </div>
+
+                <div class="search-group">
+                  <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search by name, ID, or roll number..."
+                    [(ngModel)]="searchTerm"
+                    (input)="searchStudents()"
+                  />
+                  <button class="search-btn">🔍</button>
+                </div>
+
+                <div class="view-controls">
+                  <button class="view-btn active">📋</button>
+                  <button class="view-btn">⊞</button>
+                </div>
+
+                <div class="sort-control">
+                  <label>Sort By:</label>
+                  <select class="sort-select">
+                    <option>A-Z</option>
+                    <option>Z-A</option>
+                    <option>Date Added</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="results-info">
+                <span>Showing Results: {{ showingResults }}</span>
+              </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="table-container">
+              <table class="students-table">
+                <thead>
+                  <tr>
+                    <th>Admission No</th>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Gender</th>
+                    <th>Status</th>
+                    <th>Date of Join</th>
+                    <th>DOB</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let student of filteredStudents"
+                    class="student-row"
+                  >
+                    <td class="admission-no">{{ student.id }}</td>
+                    <td class="roll-no">{{ student.rollNo }}</td>
+                    <td class="student-name">
+                      <div class="name-cell">
+                        <div class="profile-avatar">
+                          <span>{{ student.name.charAt(0) }}</span>
+                        </div>
+                        <span class="name-text">{{ student.name }}</span>
+                      </div>
+                    </td>
+                    <td class="class-cell">{{ student.class }}</td>
+                    <td class="section-cell">{{ student.section }}</td>
+                    <td class="gender-cell">{{ student.gender }}</td>
+                    <td class="status-cell">
+                      <span
+                        class="status-badge"
+                        [class.status-active]="student.status === 'Active'"
+                        [class.status-inactive]="student.status === 'Inactive'"
+                      >
+                        {{ student.status }}
+                      </span>
+                    </td>
+                    <td class="date-cell">{{ student.dateOfJoin }}</td>
+                    <td class="dob-cell">{{ student.dob }}</td>
+                    <td class="action-cell">
+                      <div class="action-buttons">
+                        <button
+                          class="action-btn add-fees-btn"
+                          (click)="addFees(student.id)"
+                          title="Add Fees"
+                        >
+                          💰
+                        </button>
+                        <button
+                          class="action-btn view-btn"
+                          (click)="viewStudent(student.id)"
+                          title="View"
+                        >
+                          👁️
+                        </button>
+                        <button
+                          class="action-btn edit-btn"
+                          (click)="editStudent(student.id)"
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          class="action-btn delete-btn"
+                          (click)="deleteStudent(student.id)"
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                        <button
+                          class="action-btn more-btn"
+                          title="More Actions"
+                        >
+                          ⋮
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+              <div class="pagination-info">
+                <span>Showing 1-10 of 656 results</span>
+              </div>
+              <div class="pagination-controls">
+                <button class="pagination-btn" disabled>‹</button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <span class="pagination-dots">...</span>
+                <button class="pagination-btn">66</button>
+                <button class="pagination-btn">›</button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</div>

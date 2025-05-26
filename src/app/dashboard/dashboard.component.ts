@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
+import { RouterModule } from '@angular/router'; // ✅ ADD THIS
 
 interface CalendarDay {
   date: number;
@@ -34,7 +35,7 @@ interface ClassPerformance {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
