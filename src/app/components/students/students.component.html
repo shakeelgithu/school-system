@@ -5,7 +5,7 @@
 
   <div class="students-content">
     <!-- Header Component -->
-    <app-header></app-header>
+    <!-- <app-header></app-header> -->
     <div class="">
 
     <div class="main-content ">
@@ -88,14 +88,6 @@
                   <button class="view-btn">⊞</button>
                 </div>
 
-                <div class="sort-control">
-                  <label>Sort By:</label>
-                  <select class="sort-select">
-                    <option>A-Z</option>
-                    <option>Z-A</option>
-                    <option>Date Added</option>
-                  </select>
-                </div>
               </div>
 
               <div class="results-info">
@@ -104,7 +96,7 @@
             </div>
 
             <!-- Students Table -->
-            <div class="table-container">
+            <div class="table-container  container">
               <table class="students-table">
                 <thead>
                   <tr>
@@ -115,7 +107,6 @@
                     <th>Section</th>
                     <th>Gender</th>
                     <th>Status</th>
-                    <th>Date of Join</th>
                     <th>DOB</th>
                     <th>Action</th>
                   </tr>
@@ -147,17 +138,11 @@
                         {{ student.status }}
                       </span>
                     </td>
-                    <td class="date-cell">{{ student.dateOfJoin }}</td>
+                    <!-- <td class="date-cell">{{ student.dateOfJoin }}</td> -->
                     <td class="dob-cell">{{ student.dob }}</td>
                     <td class="action-cell">
                       <div class="action-buttons">
-                        <button
-                          class="action-btn add-fees-btn"
-                          (click)="addFees(student.id)"
-                          title="Add Fees"
-                        >
-                          💰
-                        </button>
+                       
                         <button
                           class="action-btn view-btn"
                           (click)="viewStudent(student.id)"
@@ -179,12 +164,7 @@
                         >
                           🗑️
                         </button>
-                        <button
-                          class="action-btn more-btn"
-                          title="More Actions"
-                        >
-                          ⋮
-                        </button>
+                        
                       </div>
                     </td>
                   </tr>

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
 import { FormsModule } from '@angular/forms'; // ✅ Add this line
+import { Router } from '@angular/router';
+// import { Router } from 'express';
 
 
 
@@ -24,7 +26,7 @@ interface Student {
 @Component({
   selector: 'app-students',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent,     FormsModule  ],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, FormsModule ],
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.scss']
 })
@@ -150,6 +152,8 @@ export class StudentsComponent  implements OnInit{
   searchTerm = '';
   isSidebarOpen = true;
 
+constructor(private router: Router){}
+
   ngOnInit() {
     this.filteredStudents = [...this.students];
   }
@@ -184,6 +188,7 @@ export class StudentsComponent  implements OnInit{
 
   addStudent() {
     console.log('Add Student clicked');
+    this.router.navigateByUrl('/addstudent')
   }
 
   exportData() {
