@@ -1,0 +1,72 @@
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+  Add Student
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addStudentModalLabel">Add New Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #studentForm="ngForm">
+        <div class="modal-body row g-3">
+
+          <div class="col-md-6">
+            <label>Name</label>
+            <input type="text" class="form-control" name="name" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Father's Name</label>
+            <input type="text" class="form-control" name="fatherName" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Admission Number</label>
+            <input type="text" class="form-control" name="admissionNumber" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Class Admitted In</label>
+            <input type="text" class="form-control" name="classAdmitted" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Date of Admission</label>
+            <input type="date" class="form-control" name="admissionDate" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Current Class</label>
+            <input type="text" class="form-control" name="currentClass" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Date of Birth</label>
+            <input type="date" class="form-control" name="dob" ngModel required />
+          </div>
+
+          <div class="col-md-6">
+            <label>Photo</label>
+            <input type="file" class="form-control" name="photo" (change)="onPhotoSelected($event)" />
+          </div>
+
+          <div class="col-12">
+            <label>Address</label>
+            <textarea class="form-control" name="address" rows="2" ngModel required></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" [disabled]="!studentForm.form.valid">Submit</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,11 +1,14 @@
+
+
 <div class="students-layout">
   <app-sidebar></app-sidebar>
 
   <div class="students-content">
     <!-- Header Component -->
     <app-header></app-header>
+    <div class="">
 
-    <div class="main-content">
+    <div class="main-content ">
       <!-- student-dashboard.component.html -->
       <div class="dashboard-container">
         <!-- Main Content -->
@@ -14,11 +17,11 @@
           [class.main-content-expanded]="!isSidebarOpen"
         >
           <!-- Header -->
-          <header class="header">
+          <header class="header ">
             <div class="header-left">
-              <button class="sidebar-toggle" (click)="toggleSidebar()">
+              <!-- <button class="sidebar-toggle" (click)="toggleSidebar()">
                 <span class="hamburger"></span>
-              </button>
+              </button> -->
               <div class="breadcrumb">
                 <span class="breadcrumb-item">Dashboard</span>
                 <span class="breadcrumb-separator">/</span>
@@ -36,7 +39,7 @@
           </header>
 
           <!-- Content Area -->
-          <div class="content-area">
+          <div class="content-area container-fluid">
             <div class="page-header">
               <h1 class="page-title">Students List</h1>
               <div class="student-stats">
@@ -207,6 +210,7 @@
           </div>
         </main>
       </div>
+    </div>
     </div>
   </div>
 </div>
