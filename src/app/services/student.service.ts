@@ -38,25 +38,21 @@ export class StudentService {
       .pipe(catchError(this.handleError));
   }
 
-  // Get student by ID
   getStudentById(id: string): Observable<Student> {
     return this.http.get<Student>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Create new student
   createStudent(student: Student): Observable<StudentResponse> {
     return this.http.post<StudentResponse>(this.apiUrl, student)
       .pipe(catchError(this.handleError));
   }
 
-  // Update student
   updateStudent(id: string, student: Student): Observable<StudentResponse> {
     return this.http.put<StudentResponse>(`${this.apiUrl}/${id}`, student)
       .pipe(catchError(this.handleError));
   }
 
-  // Delete student
   deleteStudent(id: string): Observable<{message: string}> {
     return this.http.delete<{message: string}>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
