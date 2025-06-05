@@ -12,6 +12,7 @@ interface DisplayStudent {
   admissionNumber: string;
   rollNo: string;
   name: string;
+  fatherName: string;
   class: string;
   section: string;
   gender: string;
@@ -24,7 +25,7 @@ interface DisplayStudent {
 @Component({
   selector: 'app-students',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent, FormsModule, HttpClientModule],
+  imports: [CommonModule, SidebarComponent, FormsModule, HttpClientModule],
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.scss'],
   providers: [StudentService]
@@ -90,6 +91,8 @@ export class StudentsComponent implements OnInit {
       admissionNumber: student.admissionNumber,
       rollNo: student.admissionNumber, // Using admission number as roll number
       name: student.name,
+      fatherName: student.fatherName,
+      
       class: student.currentClass,
       section: 'A', // Default section since not in backend model
       gender: 'Male', // Default gender since not in backend model
