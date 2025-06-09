@@ -1,9 +1,14 @@
 <div class="header">
   <div class="search-container">
+    <!-- Hamburger button for mobile -->
+    <button class="hamburger-btn" (click)="toggleSidebar()" type="button">
+      <i class="fas fa-bars"></i>
+    </button>
+    
     <input type="text" placeholder="Search" class="search-input">
     <button class="search-btn">
-      <i class="fa fa-xmark"></i>
-        </button>
+      <i class="fa fa-search"></i>
+    </button>
   </div>
 
   <div class="header-middle">
@@ -14,42 +19,9 @@
   </div>
 
   <div class="header-right">
-    <div class="academic-year">
-      <span class="label">Academic Year:</span>
-      <span class="value">{{ academicYear }}</span>
-      <i class="fas fa-chevron-down"></i>
-    </div>
-
-    <div class="actions">
-      <button class="action-btn">
-        <img src="https://flagcdn.com/us.svg" alt="US Flag" width="24" height="16">
-      </button>
-      <button class="action-btn">
-        <i class="fa-regular fa-circle-dot"></i>
-      </button>
-
-      <button class="action-btn">
-        <i class="fa-regular fa-bell"></i>
-            </button>
-      <button class="action-btn">
-        <i class="fa-regular fa-message"></i>
-      </button>
-
-      <button class="action-btn">
-        <i class="fa-solid fa-signal"></i>
-            </button>
-
-      <button class="action-btn">
-        <i class="fas fa-expand"></i>
-      </button>
-    </div>
-
+    
     <div class="profile-mini">
-      <img src="" alt="Profile Image"> 
+      <img src="assets/girl.jpeg" alt="Profile Image"> 
     </div>
   </div>
 </div>
-
-
-
-

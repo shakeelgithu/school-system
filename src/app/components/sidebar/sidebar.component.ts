@@ -1,3 +1,4 @@
+// sidebar.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -10,25 +11,39 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
+  sidebarOpen = false;
+
   constructor(private router: Router) {}
 
   menuItems = [
-
-  { icon: 'fa-solid fa-user', route: '/profile', name: 'Profile' },
-  { icon: 'fa-solid fa-table-columns', route: '/dashboard', name: 'Dashboard' },
-  { icon: 'fa-solid fa-book', route: '/courses', name: 'Courses' },
-  { icon: 'fa-solid fa-graduation-cap', route: '/certifications', name: 'Certifications' },
-  { icon: 'fa-solid fa-calendar-days', route: '/calendar', name: 'Calendar' },
-  { icon: 'fa-solid fa-users', route: '/student-dashboard', name: 'Student Dashboard' },
-  { icon: 'fa-solid fa-dollar-sign', route: '/payments', name: 'Payments' },
-  { icon: 'fa-solid fa-message', route: '/messages', name: 'Messages' },
-  { icon: 'fa-solid fa-file', route: '/documents', name: 'Documents' },
-  { icon: 'fa-solid fa-circle', route: '/notifications', name: 'Notifications' }
-
-
+    { icon: 'fas fa-user', route: '/profile', name: 'Profile' },
+    { icon: 'fas fa-table-columns', route: '/dashboard', name: 'Dashboard' },
+    { icon: 'fas fa-book', route: '/courses', name: 'Courses' },
+    { icon: 'fas fa-graduation-cap', route: '/certifications', name: 'Certifications' },
+    { icon: 'fas fa-calendar-days', route: '/calendar', name: 'Calendar' },
+    { icon: 'fas fa-users', route: '/student-dashboard', name: 'Student Dashboard' },
+    { icon: 'fas fa-dollar-sign', route: '/payments', name: 'Payments' },
+    { icon: 'fas fa-message', route: '/messages', name: 'Messages' },
+    { icon: 'fas fa-file', route: '/documents', name: 'Documents' },
+    { icon: 'fas fa-bell', route: '/notifications', name: 'Notifications' }
   ];
 
   isActive(route: string): boolean {
     return this.router.url === route;
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
+  }
+
+  onMenuClick(route: string): void {
+    // Close sidebar on mobile when menu item is clicked
+    if (window.innerWidth < 992) {
+      this.closeSidebar();
+    }
   }
 }

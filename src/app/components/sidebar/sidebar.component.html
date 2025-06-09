@@ -1,29 +1,126 @@
-<div class="sidebar d-flex flex-column bg-white border-end">
-  <div class="logo d-flex justify-content-center align-items-center p-4">
-    <img src="assets/Islamiaschool.jpeg" alt="Logo" style="height: 100px;">
-  </div>
-
-  <div class="menu flex-grow-1 py-2">
-    <ul class="list-unstyled m-0 p-0">
-      <li *ngFor="let item of menuItems" [ngClass]="{'active': isActive(item.route)}" class="mb-1">
-        <a
-          [routerLink]="item.route"
-          class="d-flex align-items-center py-3 px-0 text-secondary"
-          [ngClass]="{'active-link': isActive(item.route)}"
-          style="cursor:pointer; transition: all 0.2s ease;"
+<div class="d-flex">
+  <!-- Mobile Navbar -->
+  <nav
+    class="navbar navbar-expand-lg navbar-light bg-white border-bottom d-lg-none fixed-top"
+  >
+    <div class="container-fluid">
+      <button
+        class="navbar-toggler border-0 p-0 me-3"
+        type="button"
+        (click)="toggleSidebar()"
+        aria-label="Toggle sidebar"
+      >
+        <i class="fas fa-bars fs-5"></i>
+      </button>
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img
+          src="assets/Islamiaschool.jpeg"
+          alt="Logo"
+          style="height: 40px"
+          class="me-2 rounded"
+        />
+        <span class="fw-bold text-primary d-none d-sm-inline"
+          >Islamia Public School</span
         >
-          <!-- Uncomment if you want icons -->
-          <!-- <i [class]="item.icon" class="me-3 fs-5"></i> -->
-          <span class="fs-6 d-none d-md-inline">{{ item.name }}</span>
-        </a>
-      </li>
-    </ul>
+      </a>
+      <div class="d-flex align-items-center">
+        <div class="dropdown">
+          <button
+            class="btn btn-link p-0 position-relative"
+            type="button"
+            data-bs-toggle="dropdown"
+          >
+            <i class="fas fa-bell text-muted fs-5"></i>
+            <span
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem"
+              >3</span
+            >
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Notifications</h6></li>
+            <li>
+              <a class="dropdown-item" href="#"
+                ><i class="fas fa-info-circle me-2 text-info"></i>New assignment
+                posted</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="#"
+                ><i class="fas fa-calendar me-2 text-warning"></i>Exam
+                reminder</a
+              >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item text-center" href="#">View all</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar Overlay for Mobile -->
+  <div
+    class="sidebar-overlay d-lg-none"
+    [class.show]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+  <!-- Sidebar -->
+  <div
+    class="sidebar d-flex flex-column bg-white border-end shadow-sm"
+    [class.sidebar-open]="sidebarOpen"
+  >
+    <!-- Logo Section -->
+    <div
+      class="logo-section d-flex justify-content-center align-items-center p-4 border-bottom"
+    >
+      <div class="text-center">
+        <img
+          src="assets/Islamiaschool.jpeg"
+          alt="Logo"
+          class="logo-img rounded-circle shadow-sm mb-2"
+        />
+        <h6 class="mb-0 fw-bold text-primary d-none d-lg-block">
+          Islamia Public School
+        </h6>
+        <small class="text-muted d-none d-lg-block">Learning Management</small>
+      </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div class="menu-section">
+      <ul class="list-unstyled m-0 p-0">
+        <li *ngFor="let item of menuItems" class="menu-item mb-1">
+          <a
+            [routerLink]="item.route"
+            class="menu-link d-flex align-items-center py-3 px-4 text-decoration-none position-relative"
+            [class.active]="isActive(item.route)"
+            (click)="onMenuClick(item.route)"
+          >
+            <div class="icon-wrapper me-3">
+              <i [class]="item.icon" class="menu-icon"></i>
+            </div>
+            <span class="menu-text">{{ item.name }}</span>
+            <div class="active-indicator"></div>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="logout-section p-4 border-top">
+      <button
+        class="logout-btn btn w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+      >
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="d-none d-lg-inline">Logout</span>
+      </button>
+    </div>
   </div>
 
-  <div class="sidebar-footer p-4">
-    <button class="logout-btn d-flex align-items-center justify-content-center gap-2 w-100 btn btn-light rounded-2">
-      <i class="icon-log-out"></i>
-      <span class="d-none d-md-inline">Logout</span>
-    </button>
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1">
+    <router-outlet></router-outlet>
   </div>
 </div>

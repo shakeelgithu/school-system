@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,9 +10,13 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  // Academic year
-  academicYear = '2024 / 2025';
+  @Output() sidebarToggle = new EventEmitter<void>();
   
   // Current date
   currentDate = new Date();
+
+  // Method to toggle sidebar
+  toggleSidebar(): void {
+    this.sidebarToggle.emit();
+  }
 }

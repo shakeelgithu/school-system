@@ -44,36 +44,12 @@
                   <span class="stat-item"
                     >All Students: {{ totalStudents }}</span
                   >
-                  <span class="stat-separator">|</span>
-                  <span class="stat-item active-stat"
-                    >Active Students: {{ activeStudents }}</span
-                  >
-                  <span class="stat-separator">|</span>
-                  <span class="stat-item inactive-stat"
-                    >Inactive Students: {{ inactiveStudents }}</span
-                  >
                 </div>
               </div>
 
               <!-- Filters and Controls -->
               <div class="controls-section">
                 <div class="filters-row">
-                  <div class="filter-group">
-                    <label for="filter-select">Filter:</label>
-                    <select
-                      id="filter-select"
-                      class="filter-select"
-                      [(ngModel)]="selectedFilter"
-                      (change)="filterStudents(selectedFilter)"
-                    >
-                      <option value="All Students">All Students</option>
-                      <option value="Active Students">Active Students</option>
-                      <option value="Inactive Students">
-                        Inactive Students
-                      </option>
-                    </select>
-                  </div>
-
                   <div class="search-group">
                     <input
                       type="text"
@@ -85,24 +61,44 @@
                     <button class="search-btn">🔍</button>
                   </div>
 
-                  <div class="view-controls">
-                    <button class="view-btn active">📋</button>
-                    <button class="view-btn">⊞</button>
-                  </div>
-
                   <div class="sort-control">
                     <label>Sort By:</label>
-                    <select class="sort-select">
-                      <option>A-Z</option>
-                      <option>Z-A</option>
-                      <option>Date Added</option>
+                    <select
+                      class="sort-select"
+                      [(ngModel)]="selectedSort"
+                      (change)="onSortChange(selectedSort)"
+                    >
+                      <option value="All Students">All Students</option>
+                      <option value="A-Z">A-Z</option>
+                      <option value="Z-A">Z-A</option>
+                      <option value="Date Added">Date Added</option>
+                      <!-- Dynamic year options -->
+                      <optgroup
+                        label="Admission Year"
+                        *ngIf="availableYears.length > 0"
+                      >
+                        <option
+                          *ngFor="let year of availableYears"
+                          [value]="year.toString()"
+                        >
+                          Year {{ year }}
+                        </option>
+                      </optgroup>
                     </select>
+                  </div>
+
+                  <div class="view-controls">
+                    <button class="view-btn" (click)="toggleView()">
+                      {{
+                        viewMode === "table" ? "⊞ Grid View" : "☰ Table View"
+                      }}
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <!-- Students Table -->
-              <div class="table-container">
+              <!-- Table View -->
+              <div class="table-container" *ngIf="viewMode === 'table'">
                 <table class="students-table">
                   <thead>
                     <tr>
@@ -117,41 +113,56 @@
                   </thead>
                   <tbody>
                     <tr
-                      *ngFor="let student of filteredStudents"
+                      *ngFor="let student of paginatedStudents"
                       class="student-row"
                     >
                       <td class="admission-no">
                         {{ student.admissionNumber }}
                       </td>
+
                       <td class="student-name">
                         <div class="name-cell">
                           <div class="profile-avatar">
-                            <span *ngIf="student.profileImage; else showInitial">
+                            <ng-container
+                              *ngIf="student.profileImage; else showInitial"
+                            >
                               <img
-                                [src]="student.profileImage"
-                                alt="Student Photo"
+                                [src]="getImageUrl(student.profileImage)"
+                                alt="{{ student.name }}'s photo"
                                 width="40"
                                 height="40"
+                                style="border-radius: 50%; object-fit: cover"
+                                (error)="onImageError($event)"
                               />
-                            </span>
+                            </ng-container>
                             <ng-template #showInitial>
-                              <span>{{
-                                student.name.charAt(0).toUpperCase()
-                              }}</span>
+                              <div
+                                style="
+                                  width: 40px;
+                                  height: 40px;
+                                  border-radius: 50%;
+                                  background-color: #ccc;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  font-weight: bold;
+                                "
+                              >
+                                {{ student.name.charAt(0).toUpperCase() }}
+                              </div>
                             </ng-template>
                           </div>
-
                           <span class="name-text">{{ student.name }}</span>
                         </div>
                       </td>
+
                       <td class="class-cell">{{ student.class }}</td>
                       <td class="father-name-cell">
-                        <!-- Father's name will be shown from backend data -->
                         <span>{{ student.fatherName }}</span>
                       </td>
-
                       <td class="date-cell">{{ student.dateOfJoin }}</td>
                       <td class="dob-cell">{{ student.dob }}</td>
+
                       <td class="action-cell">
                         <div class="action-buttons">
                           <button
@@ -174,10 +185,10 @@
 
                     <!-- No data row -->
                     <tr
-                      *ngIf="filteredStudents.length === 0"
+                      *ngIf="paginatedStudents.length === 0"
                       class="no-data-row"
                     >
-                      <td colspan="9" class="no-data-cell">
+                      <td colspan="7" class="no-data-cell">
                         <div class="no-data-message">
                           <span>No students found</span>
                         </div>
@@ -187,19 +198,178 @@
                 </table>
               </div>
 
-              <!-- Pagination -->
-              <div class="pagination-container">
+              <!-- Grid View -->
+              <div class="grid-container" *ngIf="viewMode === 'grid'">
+                <div class="students-grid">
+                  <div
+                    *ngFor="let student of paginatedStudents"
+                    class="student-card"
+                  >
+                    <div class="card-header">
+                      <div class="student-avatar">
+                        <ng-container
+                          *ngIf="student.profileImage; else showGridInitial"
+                        >
+                          <img
+                            [src]="getImageUrl(student.profileImage)"
+                            alt="{{ student.name }}'s photo"
+                            class="avatar-img"
+                            (error)="onImageError($event)"
+                          />
+                        </ng-container>
+                        <ng-template #showGridInitial>
+                          <div class="avatar-initial">
+                            {{ student.name.charAt(0).toUpperCase() }}
+                          </div>
+                        </ng-template>
+                      </div>
+                      <div class="card-actions">
+                        <button
+                          class="card-action-btn edit-btn"
+                          (click)="editStudent(student._id)"
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          class="card-action-btn delete-btn"
+                          (click)="deleteStudent(student._id)"
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="card-body">
+                      <h3 class="student-name">{{ student.name }}</h3>
+                      <div class="student-info">
+                        <div class="info-item">
+                          <span class="info-label">Admission No:</span>
+                          <span class="info-value">{{
+                            student.admissionNumber
+                          }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">Class:</span>
+                          <span class="info-value">{{ student.class }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">Father's Name:</span>
+                          <span class="info-value">{{
+                            student.fatherName
+                          }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">DOB:</span>
+                          <span class="info-value">{{ student.dob }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="info-label">Date of Join:</span>
+                          <span class="info-value">{{
+                            student.dateOfJoin
+                          }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- No data message for grid -->
+                <div
+                  *ngIf="paginatedStudents.length === 0"
+                  class="no-data-grid"
+                >
+                  <div class="no-data-message">
+                    <span>No students found</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Updated Pagination Section -->
+              <div class="pagination-container" *ngIf="totalPages > 1">
                 <div class="pagination-info">
-                  <span>Showing {{ showingResults }}</span>
+                  <span>{{ showingResults }} students</span>
                 </div>
                 <div class="pagination-controls">
-                  <button class="pagination-btn" disabled>‹</button>
-                  <button class="pagination-btn active">1</button>
-                  <button class="pagination-btn">2</button>
-                  <button class="pagination-btn">3</button>
-                  <span class="pagination-dots">...</span>
-                  <button class="pagination-btn">66</button>
-                  <button class="pagination-btn">›</button>
+                  <!-- Previous Button -->
+                  <button
+                    class="pagination-btn"
+                    [disabled]="currentPage === 1"
+                    (click)="goToPreviousPage()"
+                  >
+                    ‹
+                  </button>
+
+                  <!-- First page if not visible -->
+                  <button
+                    *ngIf="getVisiblePageNumbers()[0] > 1"
+                    class="pagination-btn"
+                    (click)="goToPage(1)"
+                  >
+                    1
+                  </button>
+
+                  <!-- Dots if gap exists -->
+                  <span
+                    *ngIf="getVisiblePageNumbers()[0] > 2"
+                    class="pagination-dots"
+                    >...</span
+                  >
+
+                  <!-- Visible page numbers -->
+                  <button
+                    *ngFor="let page of getVisiblePageNumbers()"
+                    class="pagination-btn"
+                    [class.active]="page === currentPage"
+                    (click)="goToPage(page)"
+                  >
+                    {{ page }}
+                  </button>
+
+                  <!-- Dots if gap exists -->
+                  <span
+                    *ngIf="
+                      getVisiblePageNumbers()[
+                        getVisiblePageNumbers().length - 1
+                      ] <
+                      totalPages - 1
+                    "
+                    class="pagination-dots"
+                    >...</span
+                  >
+
+                  <!-- Last page if not visible -->
+                  <button
+                    *ngIf="
+                      getVisiblePageNumbers()[
+                        getVisiblePageNumbers().length - 1
+                      ] < totalPages
+                    "
+                    class="pagination-btn"
+                    (click)="goToPage(totalPages)"
+                  >
+                    {{ totalPages }}
+                  </button>
+
+                  <!-- Next Button -->
+                  <button
+                    class="pagination-btn"
+                    [disabled]="currentPage === totalPages"
+                    (click)="goToNextPage()"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+
+              <!-- Show pagination info even when there's only one page -->
+              <div
+                class="pagination-container"
+                *ngIf="totalPages <= 1 && filteredStudents.length > 0"
+              >
+                <div class="pagination-info">
+                  <span>{{ showingResults }} students</span>
                 </div>
               </div>
             </div>
@@ -248,6 +418,7 @@
           </div>
         </div>
 
+        <!-- Photo upload section -->
         <div class="form-row">
           <div class="form-group">
             <label for="photo">Photo</label>
@@ -258,12 +429,79 @@
               (change)="onFileSelected($event)"
               accept="image/*"
             />
+
+            <!-- Image Preview -->
+            <div
+              *ngIf="imagePreview"
+              class="image-preview"
+              style="margin-top: 10px"
+            >
+              <img
+                [src]="imagePreview"
+                alt="Preview"
+                style="
+                  width: 100px;
+                  height: 100px;
+                  object-fit: cover;
+                  border-radius: 8px;
+                  border: 2px solid #ddd;
+                "
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-danger"
+                style="margin-left: 10px"
+                (click)="imagePreview = null; selectedFile = null"
+              >
+                Remove
+              </button>
+            </div>
+
+            <!-- Profile preview in modal -->
+            <div
+              class="profile-preview"
+              *ngIf="newStudent.profileImage && !imagePreview"
+            >
+              <span *ngIf="newStudent.profileImage; else showInitialModal">
+                <img
+                  [src]="getImageUrl(newStudent.profileImage)"
+                  alt="Student Photo"
+                  width="100"
+                  height="100"
+                  style="
+                    border-radius: 8px;
+                    object-fit: cover;
+                    border: 2px solid #ddd;
+                  "
+                  (error)="onImageError($event)"
+                />
+              </span>
+              <ng-template #showInitialModal>
+                <div
+                  class="initial-avatar"
+                  style="
+                    width: 100px;
+                    height: 100px;
+                    background: #f0f0f0;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #666;
+                  "
+                >
+                  {{ newStudent.name.charAt(0).toUpperCase() }}
+                </div>
+              </ng-template>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="admissionNumber">Admission Number *</label>
             <input
-              type="text"
+              type="number"
               id="admissionNumber"
               class="form-control"
               [(ngModel)]="newStudent.admissionNumber"
