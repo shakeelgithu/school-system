@@ -9,7 +9,7 @@ export interface Student {
   name: string;
   fatherName: string;
   photo?: string;
-  profileImage?: string; // ✅ Add this property
+  profileImage?: string; 
   admissionNumber: string;
   classAdmittedIn: string;
   dateOfAdmission: string;
