@@ -1,0 +1,204 @@
+/* class-promotion.component.scss */
+
+// Use existing styles from students component
+.students-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  .students-content {
+    flex: 1;
+    margin-left: 250px;
+    
+    @media (max-width: 991.98px) {
+      margin-left: 0;
+    }
+  }
+  
+  .main-content {
+    padding: 0;
+  }
+  
+  .dashboard-container {
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    padding: 20px;
+    margin-top: 70px;
+    
+    @media (min-width: 992px) {
+      margin-top: 0;
+    }
+  }
+  
+  // Header styles
+  .header {
+    background: white;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0 !important;
+  }
+  
+  .breadcrumb {
+    .breadcrumb-item {
+      color: #6c757d;
+      &.active {
+        color: #495057;
+        font-weight: 500;
+      }
+    }
+    .breadcrumb-separator {
+      margin: 0 0.5rem;
+      color: #dee2e6;
+    }
+  }
+  
+  // Custom gradient background
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  }
+  
+  // Student item hover effects
+  .student-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: rgba(0, 123, 255, 0.05);
+    }
+  }
+  
+  // Form check styling
+  .form-check-input {
+    &:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+  }
+  
+  // Card improvements
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 25px rgba(0,0,0,0.1) !important;
+    }
+  }
+  
+  // Button enhancements
+  .btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    
+    &:hover {
+      background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    }
+    
+    &:disabled {
+      background: #6c757d;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+  
+  .btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+    
+    &:hover {
+      background-color: #007bff;
+      border-color: #007bff;
+      transform: translateY(-1px);
+    }
+  }
+  
+  // Year buttons
+  .btn-outline-primary, .btn-primary {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+  }
+  
+  // Loading spinner
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  // Responsive design
+  @media (max-width: 768px) {
+    .col-lg-6 {
+      margin-bottom: 1rem;
+    }
+    
+    .card-body {
+      padding: 1rem;
+    }
+    
+    .student-item {
+      padding: 0.75rem !important;
+    }
+    
+    .btn-lg {
+      font-size: 1rem;
+      padding: 0.75rem 2rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .display-5 {
+      font-size: 1.5rem;
+    }
+    
+    .lead {
+      font-size: 1rem;
+    }
+    
+    .d-flex.flex-wrap.gap-2 {
+      justify-content: center;
+    }
+  }
+  
+  // Custom scrollbar for student lists
+  .card-body[style*="overflow-y: auto"] {
+    scrollbar-width: thin;
+    scrollbar-color: #6c757d #f8f9fa;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f8f9fa;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #6c757d;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background: #495057;
+    }
+  }
+  
+  // Animation for success states
+  .text-success {
+    animation: none;
+  }
+  
+  .card.border-primary {
+    border-width: 2px !important;
+  }
+  
+  // Avatar improvements
+  .rounded-circle {
+    border: 2px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }

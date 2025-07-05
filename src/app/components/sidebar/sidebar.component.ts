@@ -1,4 +1,4 @@
-// sidebar.component.ts
+// sidebar.component.ts (Updated)
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -22,6 +22,7 @@ export class SidebarComponent {
     { icon: 'fas fa-graduation-cap', route: '/certifications', name: 'Certifications' },
     { icon: 'fas fa-calendar-days', route: '/calendar', name: 'Calendar' },
     { icon: 'fas fa-users', route: '/student-dashboard', name: 'Student Dashboard' },
+    { icon: 'fas fa-user-graduate', route: '/class-promotion', name: 'Class Promotion' }, // New menu item
     { icon: 'fas fa-dollar-sign', route: '/payments', name: 'Payments' },
     { icon: 'fas fa-message', route: '/messages', name: 'Messages' },
     { icon: 'fas fa-file', route: '/documents', name: 'Documents' },
