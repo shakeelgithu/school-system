@@ -41,7 +41,7 @@ interface ClassPerformance {
 })
 export class DashboardComponent {
   // Dashboard data
-  userName = 'Ms.Teena';
+  userName = 'Prof,Naseeb';
   profileData = {
     id: 'T5049861',
     name: 'Henriques Morgan',
