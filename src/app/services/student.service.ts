@@ -87,22 +87,19 @@ export class StudentService {
       .pipe(catchError(this.handleError));
   }
 
-  createStudent(studentData: Student, file?: File): Observable<StudentResponse> {
-    const formData = new FormData();
-    
-    Object.keys(studentData).forEach(key => {
-      if (key !== 'photo' && key !== 'profileImage' && studentData[key as keyof Student]) {
-        formData.append(key, studentData[key as keyof Student] as string);
-      }
-    });
-    
-    if (file) {
-      formData.append('photo', file);
+createStudent(studentData: Student, file?: File): Observable<StudentResponse> {
+  const formData = new FormData();
+  Object.keys(studentData).forEach(key => {
+    if (key !== 'photo' && key !== 'profileImage' && studentData[key as keyof Student]) {
+      formData.append(key, studentData[key as keyof Student] as string);
     }
-
-    return this.http.post<StudentResponse>(this.apiUrl, formData)
-      .pipe(catchError(this.handleError));
+  });
+  if (file) {
+    formData.append('photo', file);
   }
+  return this.http.post<StudentResponse>(this.apiUrl, formData);
+}
+
 
   updateStudent(id: string, studentData: Student, file?: File): Observable<StudentResponse> {
     const formData = new FormData();

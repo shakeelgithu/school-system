@@ -16,7 +16,7 @@ export class SidebarComponent {
   constructor(private router: Router) {}
 
   menuItems = [
-    { icon: 'fas fa-user', route: '/profile', name: 'Profile' },
+    { icon: 'fas fa-user menu-icon', route: '/profile', name: 'Profile' },
     { icon: 'fas fa-table-columns', route: '/dashboard', name: 'Dashboard' },
     { icon: 'fas fa-book', route: '/courses', name: 'Courses' },
     { icon: 'fas fa-graduation-cap', route: '/certifications', name: 'Certifications' },
@@ -46,5 +46,10 @@ export class SidebarComponent {
     if (window.innerWidth < 992) {
       this.closeSidebar();
     }
+  }
+
+  logout() {
+    localStorage.removeItem('token'); // remove token
+    this.router.navigate(['/auth/login']); // redirect to login
   }
 }

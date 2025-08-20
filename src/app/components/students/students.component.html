@@ -126,14 +126,14 @@
                             <ng-container
                               *ngIf="student.profileImage; else showInitial"
                             >
-                              <img
+                              <!-- <img
                                 [src]="getImageUrl(student.profileImage)"
                                 alt="{{ student.name }}'s photo"
                                 width="40"
                                 height="40"
                                 style="border-radius: 50%; object-fit: cover"
                                 (error)="onImageError($event)"
-                              />
+                              /> -->
                             </ng-container>
                             <ng-template #showInitial>
                               <div
