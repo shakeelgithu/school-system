@@ -22,8 +22,6 @@ export class ForgotPasswordComponent {
     this.authService.sendOtp(payload).subscribe({
       next: (res) => {
         alert('OTP sent successfully to your email!');
-        // Optionally navigate to OTP verification page
-        // this.router.navigate(['/auth/verify-otp']);
       },
       error: (err) => {
         console.error(err);

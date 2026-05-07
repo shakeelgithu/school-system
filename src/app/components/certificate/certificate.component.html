@@ -1,0 +1,51 @@
+<div class="certificate-page">
+
+  <div class="page-header">
+    <h2>My Certificates</h2>
+  </div>
+
+  <!-- Certificate Buttons -->
+  <div class="cert-buttons" *ngIf="!selectedCert">
+    <button class="cert-btn" *ngFor="let cert of certificates" (click)="selectCert(cert)">
+      📄 {{ cert.title }}
+    </button>
+  </div>
+
+  <!-- Certificate Editor -->
+  <div class="cert-viewer" *ngIf="selectedCert">
+
+    <div class="viewer-actions">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+
+      <!-- Edit Tools -->
+      <div class="tools" *ngIf="isEditing">
+        <input type="color" [(ngModel)]="penColor" title="Pen Color" />
+        <input type="range" min="1" max="20" [(ngModel)]="penSize" title="Pen Size" />
+        <button (click)="setTool('pen')"   [class.active]="tool === 'pen'">✏️ Pen</button>
+        <button (click)="setTool('text')"  [class.active]="tool === 'text'">🔤 Text</button>
+        <button (click)="setTool('erase')" [class.active]="tool === 'erase'">🧹 Erase</button>
+        <button (click)="undo()">↩️ Undo</button>
+        <button (click)="clearCanvas()">🗑️ Clear</button>
+      </div>
+
+      <button class="edit-btn" (click)="toggleEdit()">
+        {{ isEditing ? '✅ Done' : '✏️ Edit' }}
+      </button>
+      <button class="print-btn" (click)="printCert()">🖨️ Print</button>
+    </div>
+
+    <!-- Canvas Editor -->
+    <div class="canvas-wrapper" id="printArea">
+      <img [src]="selectedCert.image" alt="Certificate" #certImg (load)="initCanvas()" />
+      <canvas #certCanvas
+        (mousedown)="startDraw($event)"
+        (mousemove)="draw($event)"
+        (mouseup)="stopDraw()"
+        (mouseleave)="stopDraw()"
+        [style.pointerEvents]="isEditing ? 'all' : 'none'">
+      </canvas>
+    </div>
+
+  </div>
+
+</div>

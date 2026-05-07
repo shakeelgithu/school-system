@@ -1,4 +1,3 @@
-// class-promotion.component.ts (FINAL FIXED VERSION)
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -220,16 +219,15 @@ export class ClassPromotionComponent implements OnInit {
         return;
       }
 
-      // ✅ FIX: Create complete student object with all required fields
       const newStudentRecord: Student = {
         name: student.name,
         fatherName: student.fatherName,
-        photo: student.profileImage || '', // Use empty string if no photo
+        photo: student.profileImage || '', 
         profileImage: student.profileImage || '',
-        admissionNumber: student.admissionNumber + '-' + nextYear, // ✅ FIX: Make admission number unique
-        classAdmittedIn: student.classAdmittedIn, // Keep original admission class
-        dateOfAdmission: nextYearDate, // ✅ FIX: Update to next year
-        currentClass: newClass, // ✅ FIX: New promoted class
+        admissionNumber: student.admissionNumber + '-' + nextYear, 
+        classAdmittedIn: student.classAdmittedIn, 
+        dateOfAdmission: nextYearDate,
+        currentClass: newClass,
         dateOfBirth: student.dateOfBirth,
         address: student.address
       };
@@ -244,7 +242,6 @@ export class ClassPromotionComponent implements OnInit {
         isPromoted: isPromoted
       });
 
-      // ✅ FIX: Use createStudent without file parameter
       this.studentService.createStudent(newStudentRecord).subscribe({
         next: (response) => {
           console.log(`✅ SUCCESS: Created record for ${student.name}`);
@@ -294,7 +291,6 @@ export class ClassPromotionComponent implements OnInit {
     
     alert(message);
     
-    // Reload and switch to next year
     setTimeout(() => {
       this.loadAllStudents();
     }, 1000);
@@ -307,7 +303,6 @@ export class ClassPromotionComponent implements OnInit {
     }, 3000);
   }
 
-  // Helper methods
   toggleStudent(classIndex: number, studentIndex: number) {
     this.classesData[classIndex].students[studentIndex].selected = 
       !this.classesData[classIndex].students[studentIndex].selected;

@@ -9,8 +9,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     RouterOutlet,
-    FormsModule,          // <-- added for template-driven forms (ngModel)
-    ReactiveFormsModule   // <-- added for reactive forms (FormControl, FormGroup)
+    FormsModule, 
+    ReactiveFormsModule 
   ],
   template: `<router-outlet></router-outlet>`,
   styleUrls: ['./app.component.scss']

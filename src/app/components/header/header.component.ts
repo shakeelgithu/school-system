@@ -12,10 +12,8 @@ import { CommonModule } from '@angular/common';
 export class HeaderComponent {
   @Output() sidebarToggle = new EventEmitter<void>();
   
-  // Current date
   currentDate = new Date();
 
-  // Method to toggle sidebar
   toggleSidebar(): void {
     this.sidebarToggle.emit();
   }

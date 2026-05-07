@@ -6,7 +6,10 @@ import { AddStudentComponent } from './add-student/add-student.component';
 import { ClassPromotionComponent } from './class-promotion/class-promotion.component';
 import { AuthGuard } from './auth.guard';
 
-// 👇 Inline NoAuthGuard (functional style, no extra file)
+import {PaymentComponent} from './components/payment/payment.component'
+import {FinanceComponent} from './components/finance/finance.component'
+import {CertificateComponent} from './components/certificate/certificate.component'
+
 const noAuthGuard: CanActivateFn = () => {
   const router = inject(Router);
   const token = localStorage.getItem('token');
@@ -49,4 +52,16 @@ export const routes: Routes = [
     component: ClassPromotionComponent,
     canActivate: [AuthGuard],
   },
+    {
+    path: 'payments',
+    component: PaymentComponent,
+    canActivate: [AuthGuard],
+  },
+  { path: 'finance', component: FinanceComponent },
+
+  {
+  path: 'certificates',
+  component: CertificateComponent,
+  canActivate: [AuthGuard],
+}
 ];

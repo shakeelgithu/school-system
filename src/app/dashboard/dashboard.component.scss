@@ -2,8 +2,7 @@
 .dashboard-layout {
   display: flex;
   height: 100vh;
-  font-family: "Poppins", sans-serif;
-  background-color: #f6f7fb;
+  overflow: hidden;
 }
 
 // Content area (right side of sidebar)
@@ -11,13 +10,30 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+app-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+app-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: white;
 }
 
 // Main content area (below header)
 .main-content {
-  padding: 20px;
-  padding-left: 20rem;
+  padding: 40px;
+  overflow-x: hidden;
   flex: 1;
 }
 .dashboard {
@@ -66,7 +82,6 @@
   background-position: center;
 }
 
-// Row layout for cards
 .dashboard-row {
   display: flex;
   gap: 20px;
@@ -147,7 +162,7 @@
   .links-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 12px;
 
     @media (min-width: 1200px) {
       grid-template-columns: repeat(4, 1fr);
@@ -206,7 +221,7 @@
 /* school-dashboard.component.css */
 
 .dashboard-container {
-  height: 100vh;
+  height: 70vh;
   background-color: #f9fafb;
 }
 
@@ -251,11 +266,13 @@
 }
 
 .dashboard-grid {
-  max-width: 1400px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 20px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
 }
 .flexrow {
   display: flex;
@@ -662,7 +679,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .section-header h2,
@@ -1073,7 +1092,8 @@
 .dashboard-column {
   display: flex;
   flex-direction: column;
-  width: 870px;
+    flex: 2;
+  min-width: 0;
   gap: 20px;
 }
 
@@ -1086,8 +1106,9 @@
 // Profile section
 .profile-section {
   display: flex;
-  gap: 40px;
-  margin-bottom: 20px;
+  gap: 20px;
+   flex-wrap: wrap;
+  align-items: stretch;
 
   @media (max-width: 992px) {
     flex-direction: column;
@@ -1163,13 +1184,12 @@
   }
 
   .completion-card {
-    background-color: white;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    align-items: center;
-    text-align: center;
+     display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-width: 160px;
 
     .progress-circle {
       width: 80px;
@@ -1240,11 +1260,10 @@
 }
 
 .class-cards {
-  display: flex;
+   display: flex;
   gap: 15px;
   overflow-x: auto;
-  padding-bottom: 5px;
-
+  scroll-snap-type: x mandatory;
   &::-webkit-scrollbar {
     height: 5px;
   }
@@ -1266,6 +1285,7 @@
     padding: 10px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    scroll-snap-align: start;
 
     .class-time {
       padding: 6px 12px;

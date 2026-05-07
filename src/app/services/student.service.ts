@@ -1,4 +1,3 @@
-// services/student.service.ts (Updated V2)
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -26,7 +25,6 @@ export interface StudentResponse {
   student?: Student;
 }
 
-// NEW: Promotion interfaces
 export interface PromotionRecordCreate {
   newStudents: Student[];
 }
@@ -75,8 +73,6 @@ export class StudentService {
 
   constructor(private http: HttpClient) {}
 
-  // EXISTING METHODS
-  
   getStudents(): Observable<Student[]> {
     return this.http.get<Student[]>(this.apiUrl)
       .pipe(catchError(this.handleError));
@@ -128,52 +124,42 @@ createStudent(studentData: Student, file?: File): Observable<StudentResponse> {
     return `${environment.apiUrl.replace('/api', '')}/uploads/${filename}`;
   }
 
-  // NEW PROMOTION METHODS V2
-  
-  // Create new promotion records (preserves original records)
   createPromotionRecords(newStudents: Student[]): Observable<PromotionRecordResponse> {
     const request: PromotionRecordCreate = { newStudents };
     return this.http.post<PromotionRecordResponse>(`${this.promotionUrl}/create-promotion-records`, request)
       .pipe(catchError(this.handleError));
   }
 
-  // Get students by admission year
   getStudentsByAdmissionYear(year: number): Observable<Student[]> {
     return this.http.get<Student[]>(`${this.promotionUrl}/by-admission-year/${year}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Get all admission years with statistics
   getAdmissionYears(): Observable<AdmissionYearsResponse> {
     return this.http.get<AdmissionYearsResponse>(`${this.promotionUrl}/admission-years`)
       .pipe(catchError(this.handleError));
   }
 
-  // Get students by class and admission year
   getStudentsByClassAndYear(className: string, year: number): Observable<Student[]> {
     return this.http.get<Student[]>(`${this.promotionUrl}/by-class-and-year/${className}/${year}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Get statistics for specific admission year
   getYearStatistics(year: number): Observable<any> {
     return this.http.get(`${this.promotionUrl}/stats/${year}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Check if promotion records already exist
   checkPromotionExists(fromYear: number, toYear: number): Observable<PromotionCheckResponse> {
     return this.http.get<PromotionCheckResponse>(`${this.promotionUrl}/check-promotion/${fromYear}/${toYear}`)
       .pipe(catchError(this.handleError));
   }
 
-  // Rollback promotion (delete records for specific year)
   rollbackPromotion(year: number): Observable<{message: string, deletedCount: number, year: number}> {
     return this.http.delete<{message: string, deletedCount: number, year: number}>(`${this.promotionUrl}/rollback-promotion/${year}`)
       .pipe(catchError(this.handleError));
   }
 
-  // LEGACY METHODS (for backward compatibility)
   
   bulkPromoteStudents(updates: any[]): Observable<any> {
     const request = { updates };
@@ -201,7 +187,6 @@ createStudent(studentData: Student, file?: File): Observable<StudentResponse> {
       .pipe(catchError(this.handleError));
   }
 
-  // Error handling
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
     

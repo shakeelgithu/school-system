@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +32,9 @@ interface DisplayStudent {
 })
 export class StudentsComponent implements OnInit {
 
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
+
   students: DisplayStudent[] = [];
   filteredStudents: DisplayStudent[] = [];
   paginatedStudents: DisplayStudent[] = [];
@@ -43,23 +46,23 @@ export class StudentsComponent implements OnInit {
   searchTerm = '';
   isSidebarOpen = true;
   loading = false;
-  
-  // Pagination properties
+
   currentPage = 1;
   itemsPerPage = 6;
   totalPages = 0;
-  
-  // Add sorting properties
+
   selectedSort = 'All Students';
   availableYears: number[] = [];
-  
-  // Modal properties
+
   isModalOpen = false;
   isEditMode = false;
   editingStudentId = '';
   selectedFile: File | null = null;
   imagePreview: string | null = null;
-  
+
+  showCamera = false;
+  private cameraStream: MediaStream | null = null;
+
   newStudent: Student = {
     name: '',
     fatherName: '',
@@ -88,6 +91,7 @@ export class StudentsComponent implements OnInit {
     this.viewMode = this.viewMode === 'table' ? 'grid' : 'table';
   }
 
+
   loadStudents() {
     this.loading = true;
     this.studentService.getStudents().subscribe({
@@ -106,7 +110,7 @@ export class StudentsComponent implements OnInit {
     });
   }
 
-  // Pagination methods
+
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredStudents.length / this.itemsPerPage);
     if (this.currentPage > this.totalPages) {
@@ -136,39 +140,30 @@ export class StudentsComponent implements OnInit {
     }
   }
 
-  goToNextPage() {
-    this.goToPage(this.currentPage + 1);
-  }
-
-  goToPreviousPage() {
-    this.goToPage(this.currentPage - 1);
-  }
+  goToNextPage() { this.goToPage(this.currentPage + 1); }
+  goToPreviousPage() { this.goToPage(this.currentPage - 1); }
 
   getVisiblePageNumbers(): number[] {
     const pages: number[] = [];
     const maxVisiblePages = 5;
-    
+
     if (this.totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= this.totalPages; i++) pages.push(i);
     } else {
       const start = Math.max(1, this.currentPage - 2);
       const end = Math.min(this.totalPages, start + maxVisiblePages - 1);
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
+      for (let i = start; i <= end; i++) pages.push(i);
     }
-    
+
     return pages;
   }
+
 
   mapStudentsToDisplay(students: Student[]): DisplayStudent[] {
     return students.map(student => {
       const admissionDate = new Date(student.dateOfAdmission);
       const admissionYear = admissionDate.getFullYear();
-      
+
       return {
         _id: student._id || '',
         admissionNumber: student.admissionNumber,
@@ -211,28 +206,24 @@ export class StudentsComponent implements OnInit {
     this.inactiveStudents = this.students.filter(s => s.status === 'Inactive').length;
   }
 
-  // FIXED: Combined filter and search logic
+
   applyFiltersAndSearch() {
-    // Start with all students
     let result = [...this.students];
-    
-    // Apply status filter first
+
     if (this.selectedFilter === 'Active Students') {
       result = result.filter(s => s.status === 'Active');
     } else if (this.selectedFilter === 'Inactive Students') {
       result = result.filter(s => s.status === 'Inactive');
     }
-    
-    // Apply year filter if selected
+
     if (this.availableYears.includes(parseInt(this.selectedSort))) {
       const selectedYear = parseInt(this.selectedSort);
       result = result.filter(student => student.admissionYear === selectedYear);
     }
-    
-    // Apply search filter
+
     if (this.searchTerm.trim()) {
       const searchLower = this.searchTerm.toLowerCase().trim();
-      result = result.filter(student => 
+      result = result.filter(student =>
         student.name.toLowerCase().includes(searchLower) ||
         student.fatherName.toLowerCase().includes(searchLower) ||
         student.admissionNumber.toLowerCase().includes(searchLower) ||
@@ -241,8 +232,7 @@ export class StudentsComponent implements OnInit {
         student.section.toLowerCase().includes(searchLower)
       );
     }
-    
-    // Apply sorting
+
     if (this.selectedSort === 'A-Z') {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (this.selectedSort === 'Z-A') {
@@ -250,7 +240,7 @@ export class StudentsComponent implements OnInit {
     } else if (this.selectedSort === 'Date Added') {
       result.sort((a, b) => new Date(b.dateOfJoin).getTime() - new Date(a.dateOfJoin).getTime());
     }
-    
+
     this.filteredStudents = result;
     this.currentPage = 1;
     this.updatePagination();
@@ -261,37 +251,13 @@ export class StudentsComponent implements OnInit {
     this.applyFiltersAndSearch();
   }
 
-  searchStudents() {
-    this.applyFiltersAndSearch();
-  }
+  searchStudents() { this.applyFiltersAndSearch(); }
 
   onSortChange(sortValue: string) {
     this.selectedSort = sortValue;
     this.applyFiltersAndSearch();
   }
-  
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file');
-        return;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size should not exceed 5MB');
-        return;
-      }
-      
-      this.selectedFile = file;
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+
 
   getImageUrl(filename: string): string {
     return this.studentService.getImageUrl(filename);
@@ -301,6 +267,62 @@ export class StudentsComponent implements OnInit {
     const target = event.target as HTMLImageElement;
     target.src = 'assets/images/default-avatar.jpg';
   }
+
+
+  openCamera() {
+    this.showCamera = true;
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' } 
+    })
+    .then(stream => {
+      this.cameraStream = stream;
+      this.videoElement.nativeElement.srcObject = stream;
+    })
+    .catch(err => {
+      console.error('Camera error:', err);
+      alert('Could not access camera. Please allow camera permission.');
+      this.showCamera = false;
+    });
+  }
+
+  capturePhoto() {
+    const video = this.videoElement.nativeElement;
+    const canvas = this.canvasElement.nativeElement;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+      if (blob) {
+        this.selectedFile = new File([blob], 'student-photo.jpg', { type: 'image/jpeg' });
+        this.imagePreview = canvas.toDataURL('image/jpeg');
+      }
+    }, 'image/jpeg', 0.9);
+
+    this.stopCamera();
+    this.showCamera = false;
+  }
+
+  cancelCamera() {
+    this.stopCamera();
+    this.showCamera = false;
+  }
+
+  stopCamera() {
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(track => track.stop());
+      this.cameraStream = null;
+    }
+  }
+
+  removePhoto() {
+    this.imagePreview = null;
+    this.selectedFile = null;
+  }
+
 
   addStudent() {
     this.isEditMode = false;
@@ -312,7 +334,7 @@ export class StudentsComponent implements OnInit {
     this.isEditMode = true;
     this.editingStudentId = studentId;
     this.isModalOpen = true;
-    
+
     this.studentService.getStudentById(studentId).subscribe({
       next: (student) => {
         this.newStudent = {
@@ -327,7 +349,7 @@ export class StudentsComponent implements OnInit {
           dateOfBirth: student.dateOfBirth.split('T')[0],
           address: student.address
         };
-        
+
         if (student.photo || student.profileImage) {
           this.imagePreview = this.getImageUrl(student.photo || student.profileImage || '');
         }
@@ -339,6 +361,8 @@ export class StudentsComponent implements OnInit {
   }
 
   closeModal() {
+    this.stopCamera();
+    this.showCamera = false;
     this.isModalOpen = false;
     this.resetForm();
   }
@@ -360,6 +384,7 @@ export class StudentsComponent implements OnInit {
     this.selectedFile = null;
     this.imagePreview = null;
   }
+
 
   onSubmit() {
     if (this.isEditMode) {
@@ -387,6 +412,7 @@ export class StudentsComponent implements OnInit {
     }
   }
 
+
   deleteStudent(studentId: string) {
     if (confirm('Are you sure you want to delete this student?')) {
       this.studentService.deleteStudent(studentId).subscribe({
@@ -401,8 +427,8 @@ export class StudentsComponent implements OnInit {
     }
   }
 
+
   exportData() {
-    console.log('Export data clicked');
     const csvData = this.convertToCSV(this.students);
     this.downloadCSV(csvData, 'students.csv');
   }
@@ -410,7 +436,7 @@ export class StudentsComponent implements OnInit {
   convertToCSV(data: DisplayStudent[]): string {
     const headers = ['Admission No', 'Roll No', 'Name', 'Class', 'Section', 'Status', 'Date of Join', 'DOB'];
     const csvRows = [headers.join(',')];
-    
+
     data.forEach(student => {
       const row = [
         student.admissionNumber,
@@ -424,7 +450,7 @@ export class StudentsComponent implements OnInit {
       ];
       csvRows.push(row.join(','));
     });
-    
+
     return csvRows.join('\n');
   }
 

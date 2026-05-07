@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { HeaderComponent } from '../components/header/header.component';
-import { RouterModule } from '@angular/router'; // ✅ ADD THIS
+import { RouterModule } from '@angular/router'; 
 
 interface CalendarDay {
   date: number;
@@ -40,7 +40,6 @@ interface ClassPerformance {
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  // Dashboard data
   userName = 'Prof,Naseeb';
   profileData = {
     id: 'T5049861',
@@ -50,7 +49,6 @@ export class DashboardComponent {
 
   completionPercentage = 95;
 
-  // Classes for today
   todaysClasses = [
     { time: '09:00 - 09:45', class: 'Class V, B', color: 'red' },
     { time: '09:45 - 10:30', class: 'Class IV, C', color: 'red' },
@@ -59,7 +57,6 @@ export class DashboardComponent {
     { time: '02:15 - 03:00', class: 'Class III, B', color: 'blue' },
   ];
 
-  // Quick links
   quickLinks = [
     { name: 'Time Table', icon: 'fa-regular fa-calendar', color: 'red' },
     { name: 'Attendance', icon: 'fa fa-clipboard-user', color: 'blue' },
@@ -67,7 +64,6 @@ export class DashboardComponent {
     { name: 'Reports', icon: 'fa-regular fa-clipboard', color: 'green' },
   ];
 
-  // Notice message
   notice = 'There is a staff meeting at 9AM today. Dont forget to Attend!!!';
 
   currentDate: Date = new Date();
@@ -90,7 +86,6 @@ export class DashboardComponent {
     'December',
   ];
 
-  // Highlighted dates (similar to what's shown in the image)
   highlightedDates: number[] = [6, 7, 12, 18];
 
   constructor() {
@@ -105,25 +100,21 @@ export class DashboardComponent {
   generateCalendar(): void {
     this.days = [];
 
-    // Get the first day of the month
     const firstDay = new Date(this.currentYear, this.currentMonth, 1);
     const startingDay = firstDay.getDay();
 
-    // Get the number of days in the month
     const monthLength = new Date(
       this.currentYear,
       this.currentMonth + 1,
       0
     ).getDate();
 
-    // Get the number of days in the previous month
     const prevMonthLength = new Date(
       this.currentYear,
       this.currentMonth,
       0
     ).getDate();
 
-    // Fill in days from previous month
     for (let i = startingDay - 1; i >= 0; i--) {
       this.days.push({
         date: prevMonthLength - i,
@@ -132,7 +123,6 @@ export class DashboardComponent {
       });
     }
 
-    // Fill in days from current month
     for (let i = 1; i <= monthLength; i++) {
       this.days.push({
         date: i,
@@ -141,7 +131,6 @@ export class DashboardComponent {
       });
     }
 
-    // Fill remaining slots with days from next month
     const totalCells = Math.ceil(this.days.length / 7) * 7;
     let nextMonthDay = 1;
     while (this.days.length < totalCells) {

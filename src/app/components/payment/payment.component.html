@@ -1,0 +1,348 @@
+<!-- src/pages/payment/payment.component.html -->
+<!-- Fee Management Page -->
+
+<div class="fee-page">
+
+  <div class="toast" *ngIf="toast" [class]="'toast--' + toast.type">
+    <span class="toast__icon">{{ toast.type === 'success' ? '✓' : '✕' }}</span>
+    {{ toast.message }}
+  </div>
+
+  <div class="modal-overlay" *ngIf="deletingId" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3 class="modal__title">Delete Fee Record?</h3>
+      <p class="modal__body">This action cannot be undone.</p>
+      <div class="modal__actions">
+        <button class="btn btn--outline" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn--danger"  (click)="onDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">
+        <span class="page-title__icon">💳</span>
+        Fee Management
+      </h1>
+      <p class="page-subtitle">Track and manage student fee records</p>
+    </div>
+    <button class="btn btn--primary" (click)="openAddForm()">
+      <span>＋</span> Add Fee Record
+    </button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card summary-card--blue">
+      <div class="summary-card__label">Total Assigned</div>
+      <div class="summary-card__value">PKR {{ summary.totalFeeAmount | number }}</div>
+      <div class="summary-card__sub">{{ summary.totalRecords }} records</div>
+    </div>
+    <div class="summary-card summary-card--green">
+      <div class="summary-card__label">Collected</div>
+      <div class="summary-card__value">PKR {{ summary.totalSubmitted | number }}</div>
+      <div class="summary-card__sub">{{ summary.completeCount }} complete</div>
+    </div>
+    <div class="summary-card summary-card--red">
+      <div class="summary-card__label">Pending Dues</div>
+      <div class="summary-card__value">PKR {{ summary.totalPending | number }}</div>
+      <div class="summary-card__sub">{{ summary.pendingCount }} pending</div>
+    </div>
+    <div class="summary-card summary-card--purple">
+      <div class="summary-card__label">Collection Rate</div>
+      <div class="summary-card__value">
+        {{ summary.totalFeeAmount > 0 ? ((summary.totalSubmitted / summary.totalFeeAmount) * 100 | number:'1.0-0') : 0 }}%
+      </div>
+      <div class="summary-card__sub">of total fees</div>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <div class="search-box">
+      <span class="search-box__icon">🔍</span>
+      <input
+        type="text"
+        class="search-box__input"
+        placeholder="Search by name or roll no..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearch(searchQuery)"
+      />
+    </div>
+
+    <select class="filter-select" (change)="onFilterChange('status', $any($event.target).value)">
+      <option value="">All Status</option>
+      <option value="Complete">Complete</option>
+      <option value="Pending">Pending</option>
+    </select>
+
+    <input
+      type="text"
+      class="filter-select"
+      placeholder="Filter by class..."
+      #classFilter
+      (input)="onFilterChange('className', classFilter.value)"
+    />
+
+    <input
+      type="text"
+      class="filter-select"
+      placeholder="Filter by period..."
+      #periodFilter
+      (input)="onFilterChange('feePeriod', periodFilter.value)"
+    />
+
+    <button class="btn btn--ghost" (click)="clearFilters()">Clear</button>
+  </div>
+
+  <div class="form-panel" *ngIf="showForm">
+    <div class="form-panel__header">
+      <h2 class="form-panel__title">
+        {{ isEditing ? '✏️ Edit Fee Record' : '➕ Add New Fee Record' }}
+      </h2>
+      <button class="form-panel__close" (click)="closeForm()">✕</button>
+    </div>
+
+    <form [formGroup]="feeForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <div class="form-group student-search-group">
+        <label class="form-label">
+          Student <span class="required">*</span>
+          <span class="form-label__hint">Type name or roll number to search</span>
+        </label>
+
+        <div class="autocomplete-wrap">
+
+          <div class="student-chip" *ngIf="selectedStudent">
+            <span class="student-chip__avatar">
+              {{ selectedStudent.name.charAt(0).toUpperCase() }}
+            </span>
+            <div class="student-chip__info">
+              <span class="student-chip__name">{{ selectedStudent.name }}</span>
+              <span class="student-chip__roll">{{ selectedStudent.rollNumber }}</span>
+            </div>
+            <button
+              type="button"
+              class="student-chip__clear"
+              (click)="clearSelectedStudent(); feeForm.get('studentSearch')?.setValue('')"
+              title="Change student"
+            >✕</button>
+          </div>
+
+          <div class="autocomplete-input-wrap" *ngIf="!selectedStudent">
+            <span class="autocomplete-icon">
+              <span *ngIf="!isSearchingStudents">🔍</span>
+              <span *ngIf="isSearchingStudents" class="spinner-sm"></span>
+            </span>
+            <input
+              type="text"
+              class="form-control form-control--search"
+              [class.form-control--error]="isInvalid('studentSearch')"
+              formControlName="studentSearch"
+              placeholder="e.g. Ahmed Khan or 2024-CS-001"
+              autocomplete="off"
+              (input)="onStudentSearchInput($any($event.target).value)"
+              (blur)="onStudentBlur()"
+              (focus)="showSuggestions = studentSuggestions.length > 0"
+            />
+          </div>
+
+          <ul class="suggestions-list" *ngIf="showSuggestions && studentSuggestions.length > 0">
+            <li
+              *ngFor="let s of studentSuggestions"
+              class="suggestions-list__item"
+              (mousedown)="selectStudent(s)"
+            >
+              <span class="suggestion__avatar">{{ s.name.charAt(0).toUpperCase() }}</span>
+              <div class="suggestion__info">
+                <span class="suggestion__name">{{ s.name }}</span>
+                <span class="suggestion__meta">{{ s.rollNumber }}{{ s.className ? ' · ' + s.className : '' }}</span>
+              </div>
+            </li>
+          </ul>
+
+          <div
+            class="suggestions-empty"
+            *ngIf="showSuggestions && studentSuggestions.length === 0 && !isSearchingStudents"
+          >
+            <span>😕</span> No students found. <a href="#" (click)="$event.preventDefault()">Register student first?</a>
+          </div>
+        </div>
+
+        <input type="hidden" formControlName="studentId" />
+        <input type="hidden" formControlName="studentName" />
+        <input type="hidden" formControlName="rollNumber" />
+
+        <span class="form-error" *ngIf="isInvalid('studentSearch')">
+          Please search and select a student from the list
+        </span>
+        <span class="form-error" *ngIf="isInvalid('studentId')">
+          Student must be selected from search results (not typed manually)
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Class <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="isInvalid('className')"
+            formControlName="className"
+            placeholder="e.g. Grade 10-A"
+          />
+          <span class="form-error" *ngIf="isInvalid('className')">Class is required</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fee Period <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="isInvalid('feePeriod')"
+            formControlName="feePeriod"
+            placeholder="e.g. April 2025"
+          />
+          <span class="form-error" *ngIf="isInvalid('feePeriod')">Fee period is required</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Total Fee (PKR) <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="isInvalid('totalFee')"
+            formControlName="totalFee"
+            placeholder="e.g. 5000"
+            min="0"
+          />
+          <span class="form-error" *ngIf="isInvalid('totalFee')">Valid total fee is required</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Submitted Fee (PKR) <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="isInvalid('submittedFee')"
+            formControlName="submittedFee"
+            placeholder="e.g. 3000"
+            min="0"
+          />
+          <span class="form-error" *ngIf="feeForm.get('submittedFee')?.errors?.['exceedsTotal'] && feeForm.get('submittedFee')?.touched">
+            Cannot exceed total fee
+          </span>
+          <span class="form-error" *ngIf="isInvalid('submittedFee') && !feeForm.get('submittedFee')?.errors?.['exceedsTotal']">
+            Valid submitted fee is required
+          </span>
+        </div>
+      </div>
+
+      <div class="fee-preview">
+        <div class="fee-preview__item">
+          <span>Pending Dues</span>
+          <strong class="text-danger">PKR {{ livePending | number }}</strong>
+        </div>
+        <div class="fee-preview__item">
+          <span>Status</span>
+          <span class="status-badge" [class]="'status-badge--' + liveStatus.toLowerCase()">
+            {{ liveStatus }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <textarea
+          class="form-control"
+          formControlName="notes"
+          rows="2"
+          placeholder="Any additional remarks..."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn--outline" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn--primary" [disabled]="isSubmitting">
+          <span *ngIf="isSubmitting">Saving...</span>
+          <span *ngIf="!isSubmitting">{{ isEditing ? 'Update Record' : 'Save Record' }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="table-container">
+
+    <!-- Loading state -->
+    <div class="table-loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading fee records...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div class="table-empty" *ngIf="!isLoading && fees.length === 0">
+      <span class="table-empty__icon">📋</span>
+      <p>No fee records found.</p>
+      <button class="btn btn--primary" (click)="openAddForm()">Add First Record</button>
+    </div>
+
+    <!-- Table -->
+    <table class="fee-table" *ngIf="!isLoading && fees.length > 0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Roll No</th>
+          <th>Class</th>
+          <th>Period</th>
+          <th>Total Fee</th>
+          <th>Submitted</th>
+          <th>Pending Dues</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let fee of fees; let i = index; trackBy: trackByFee"
+          [class.row--complete]="fee.status === 'Complete'"
+        >
+          <td class="cell-index">{{ i + 1 }}</td>
+          <td class="cell-name">{{ fee.studentName }}</td>
+          <td class="cell-roll">{{ fee.rollNumber }}</td>
+          <td>{{ fee.className }}</td>
+          <td>{{ fee.feePeriod }}</td>
+          <td class="cell-amount">PKR {{ fee.totalFee | number }}</td>
+          <td class="cell-amount cell-amount--paid">PKR {{ fee.submittedFee | number }}</td>
+          <td class="cell-amount cell-amount--due">PKR {{ fee.pendingDues | number }}</td>
+          <td>
+            <span class="status-badge" [class]="'status-badge--' + fee.status!.toLowerCase()">
+              {{ fee.status }}
+            </span>
+          </td>
+          <td class="cell-notes" [title]="fee.notes || ''">{{ fee.notes || '—' }}</td>
+          <td class="cell-actions">
+            <button class="action-btn action-btn--edit"   (click)="openEditForm(fee)"      title="Edit">✏️</button>
+            <button class="action-btn action-btn--print"  (click)="printStudentSlip(fee)"  title="Print Slip">🖨️</button>
+            <button class="action-btn action-btn--delete" (click)="confirmDelete(fee._id!)" title="Delete">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="totals-row">
+          <td colspan="5" class="totals-label">Totals</td>
+          <td class="cell-amount">PKR {{ summary.totalFeeAmount | number }}</td>
+          <td class="cell-amount cell-amount--paid">PKR {{ summary.totalSubmitted | number }}</td>
+          <td class="cell-amount cell-amount--due">PKR {{ summary.totalPending | number }}</td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+
+  </div>
+
+</div>

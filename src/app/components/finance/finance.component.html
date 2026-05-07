@@ -1,0 +1,542 @@
+<div class="finance-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="finance-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="breadcrumb">
+          <span>Dashboard</span> <span class="sep">/</span>
+          <span class="active">Finance & Expenditure</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-outline" (click)="printReport()">🖨️ Print Report</button>
+      </div>
+    </header>
+
+    <!-- Overview Cards -->
+    <div class="overview-cards">
+      <div class="card income">
+        <div class="card-icon">💰</div>
+        <div class="card-info">
+          <span class="label">Total Fee Income</span>
+          <span class="amount">{{ formatCurrency(totalFeeIncome) }}</span>
+        </div>
+      </div>
+      <div class="card salaries">
+        <div class="card-icon">👨‍🏫</div>
+        <div class="card-info">
+          <span class="label">Teacher Salaries Paid</span>
+          <span class="amount">{{ formatCurrency(totalSalaries) }}</span>
+        </div>
+      </div>
+      <div class="card expenses">
+        <div class="card-icon">🧾</div>
+        <div class="card-info">
+          <span class="label">Other Expenses</span>
+          <span class="amount">{{ formatCurrency(totalExpenses) }}</span>
+        </div>
+      </div>
+      <div class="card net" [class.negative]="netBalance < 0">
+        <div class="card-icon">📊</div>
+        <div class="card-info">
+          <span class="label">Net Balance</span>
+          <span class="amount">{{ formatCurrency(netBalance) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="activeTab==='overview'"   (click)="activeTab='overview'; loadSummary()">📋 Monthly Report</button>
+      <button [class.active]="activeTab==='fees'"       (click)="activeTab='fees'">💰 Fee Collection</button>
+      <button [class.active]="activeTab==='teachers'"   (click)="activeTab='teachers'">👨‍🏫 Teachers</button>
+      <button [class.active]="activeTab==='salaries'"   (click)="activeTab='salaries'">💵 Salary Payments</button>
+      <button [class.active]="activeTab==='expenses'"   (click)="activeTab='expenses'">🧾 Other Expenses</button>
+    </div>
+
+    <div class="tab-content">
+
+      <!-- ── MONTHLY REPORT TAB ── -->
+      <div *ngIf="activeTab==='overview'" class="report-section printable">
+        <div class="report-controls no-print">
+          <select [(ngModel)]="selectedMonth">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+          </select>
+          <select [(ngModel)]="selectedYear">
+            <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+          </select>
+          <button class="btn btn-primary" (click)="loadSummary()">Generate Report</button>
+        </div>
+
+        <div *ngIf="summary" class="report-body">
+          <div class="report-header print-only">
+            <h2>School Finance Report</h2>
+            <p>{{ getMonthLabel(summary.month) }} {{ summary.year }}</p>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="summary-grid">
+            <div class="summary-box income">
+              <h4>Fee Income</h4>
+              <p>{{ formatCurrency(summary.totalIncome) }}</p>
+            </div>
+            <div class="summary-box salary">
+              <h4>Salaries Paid</h4>
+              <p>{{ formatCurrency(summary.totalSalaries) }}</p>
+            </div>
+            <div class="summary-box expense">
+              <h4>Other Expenses</h4>
+              <p>{{ formatCurrency(summary.totalExpenses) }}</p>
+            </div>
+            <div class="summary-box net" [class.negative]="summary.netBalance < 0">
+              <h4>Net Balance</h4>
+              <p>{{ formatCurrency(summary.netBalance) }}</p>
+            </div>
+          </div>
+
+          <!-- Fee Collection List -->
+          <h3 class="section-title">Fee Collection</h3>
+          <table class="report-table">
+            <thead>
+              <tr><th>Student</th><th>Class</th><th>Admission No</th><th>Paid On</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of summary.feeIncome">
+                <td>{{ f.student?.name }}</td>
+                <td>{{ f.student?.currentClass }}</td>
+                <td>{{ f.student?.admissionNumber }}</td>
+                <td>{{ formatDate(f.paidOn) }}</td>
+                <td>{{ formatCurrency(f.amount) }}</td>
+                <td><span class="badge" [class]="f.status.toLowerCase()">{{ f.status }}</span></td>
+              </tr>
+              <tr *ngIf="summary.feeIncome.length===0">
+                <td colspan="6" class="no-data">No fee records this month</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Salary Breakdown -->
+          <h3 class="section-title">Teacher Salary Breakdown</h3>
+          <table class="report-table">
+            <thead>
+              <tr><th>Teacher</th><th>Subject</th><th>Monthly Salary</th><th>Advance</th><th>Deduction</th><th>Net Paid</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of summary.salaries">
+                <td>{{ s.teacher?.name }}</td>
+                <td>{{ s.teacher?.subject }}</td>
+                <td>{{ formatCurrency(s.amount) }}</td>
+                <td>{{ formatCurrency(s.advance) }}</td>
+                <td>{{ formatCurrency(s.deduction) }}</td>
+                <td><strong>{{ formatCurrency(s.netPaid) }}</strong></td>
+                <td><span class="badge" [class]="s.status.toLowerCase()">{{ s.status }}</span></td>
+              </tr>
+              <tr *ngIf="summary.salaries.length===0">
+                <td colspan="7" class="no-data">No salary payments this month</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Expense Details -->
+          <h3 class="section-title">Expense Details</h3>
+          <table class="report-table">
+            <thead>
+              <tr><th>Title</th><th>Category</th><th>Paid To</th><th>Date</th><th>Amount</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of summary.expenses">
+                <td>{{ e.title }}</td>
+                <td>{{ e.category }}</td>
+                <td>{{ e.paidTo }}</td>
+                <td>{{ formatDate(e.date) }}</td>
+                <td>{{ formatCurrency(e.amount) }}</td>
+              </tr>
+              <tr *ngIf="summary.expenses.length===0">
+                <td colspan="5" class="no-data">No expenses this month</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="print-footer no-print">
+            <button class="btn btn-primary" (click)="printReport()">🖨️ Print This Report</button>
+          </div>
+        </div>
+
+        <div *ngIf="!summary" class="empty-state">
+          <p>Select a month and year, then click Generate Report</p>
+        </div>
+      </div>
+
+      <!-- ── FEE COLLECTION TAB ── -->
+      <div *ngIf="activeTab==='fees'">
+        <div class="tab-header">
+          <h3>Fee Collection</h3>
+          <button class="btn btn-primary" (click)="openAddFee()">➕ Add Fee Record</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Student</th><th>Class</th><th>Month</th><th>Paid On</th><th>Amount</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of fees">
+              <td>{{ f.student?.name }}</td>
+              <td>{{ f.student?.currentClass }}</td>
+              <td>{{ getMonthLabel(f.month) }} {{ f.year }}</td>
+              <td>{{ formatDate(f.paidOn) }}</td>
+              <td>{{ formatCurrency(f.amount) }}</td>
+              <td><span class="badge" [class]="f.status.toLowerCase()">{{ f.status }}</span></td>
+              <td>
+                <button class="action-btn delete-btn" (click)="f._id && deleteFee(f._id)">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="fees.length===0"><td colspan="7" class="no-data">No fee records found</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── TEACHERS TAB ── -->
+      <div *ngIf="activeTab==='teachers'">
+        <div class="tab-header">
+          <h3>Teachers</h3>
+          <button class="btn btn-primary" (click)="openAddTeacher()">➕ Add Teacher</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>Subject</th><th>Phone</th><th>Monthly Salary</th><th>Joining Date</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of teachers">
+              <td>{{ t.name }}</td>
+              <td>{{ t.subject }}</td>
+              <td>{{ t.phone }}</td>
+              <td>{{ formatCurrency(t.monthlySalary) }}</td>
+              <td>{{ formatDate(t.joiningDate) }}</td>
+              <td><span class="badge" [class]="t.status.toLowerCase()">{{ t.status }}</span></td>
+              <td>
+                <button class="action-btn edit-btn" (click)="openEditTeacher(t)">✏️</button>
+                <button class="action-btn delete-btn" (click)="deleteTeacher(t._id!)">🗑️</button>
+                <button class="btn btn-sm btn-primary" (click)="openAddSalary(t); activeTab='salaries'">💵 Pay</button>
+              </td>
+            </tr>
+            <tr *ngIf="teachers.length===0"><td colspan="7" class="no-data">No teachers found</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── SALARY PAYMENTS TAB ── -->
+      <div *ngIf="activeTab==='salaries'">
+        <div class="tab-header">
+          <h3>Salary Payments</h3>
+          <button class="btn btn-primary" (click)="openAddSalary()">➕ Add Payment</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Teacher</th><th>Subject</th><th>Month</th><th>Salary</th><th>Advance</th><th>Deduction</th><th>Net Paid</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of salaries">
+              <td>{{ s.teacher?.name }}</td>
+              <td>{{ s.teacher?.subject }}</td>
+              <td>{{ getMonthLabel(s.month) }} {{ s.year }}</td>
+              <td>{{ formatCurrency(s.amount) }}</td>
+              <td>{{ formatCurrency(s.advance) }}</td>
+              <td>{{ formatCurrency(s.deduction) }}</td>
+              <td><strong>{{ formatCurrency(s.netPaid) }}</strong></td>
+              <td><span class="badge" [class]="s.status.toLowerCase()">{{ s.status }}</span></td>
+              <td>
+                <button class="action-btn delete-btn" (click)="deleteSalary(s._id!)">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="salaries.length===0"><td colspan="9" class="no-data">No salary payments found</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── EXPENSES TAB ── -->
+      <div *ngIf="activeTab==='expenses'">
+        <div class="tab-header">
+          <h3>Other Expenses</h3>
+          <button class="btn btn-primary" (click)="openAddExpense()">➕ Add Expense</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Title</th><th>Category</th><th>Paid To</th><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of expenses">
+              <td>{{ e.title }}</td>
+              <td>{{ e.category }}</td>
+              <td>{{ e.paidTo }}</td>
+              <td>{{ formatDate(e.date) }}</td>
+              <td>{{ e.description }}</td>
+              <td>{{ formatCurrency(e.amount) }}</td>
+              <td>
+                <button class="action-btn edit-btn" (click)="openEditExpense(e)">✏️</button>
+                <button class="action-btn delete-btn" (click)="deleteExpense(e._id!)">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="expenses.length===0"><td colspan="7" class="no-data">No expenses found</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- end tab-content -->
+  </div><!-- end finance-content -->
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODALS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- Teacher Modal -->
+<div class="modal-overlay" *ngIf="showTeacherModal" (click)="showTeacherModal=false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Teacher' : 'Add Teacher' }}</h2>
+      <button class="modal-close-btn" (click)="showTeacherModal=false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name *</label>
+          <input class="form-control" [(ngModel)]="teacherForm.name" placeholder="Teacher name" />
+        </div>
+        <div class="form-group">
+          <label>Subject *</label>
+          <input class="form-control" [(ngModel)]="teacherForm.subject" placeholder="Subject taught" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone</label>
+          <input class="form-control" [(ngModel)]="teacherForm.phone" placeholder="Phone number" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input class="form-control" [(ngModel)]="teacherForm.email" placeholder="Email address" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly Salary (PKR) *</label>
+          <input type="number" class="form-control" [(ngModel)]="teacherForm.monthlySalary" />
+        </div>
+        <div class="form-group">
+          <label>Joining Date *</label>
+          <input type="date" class="form-control" [(ngModel)]="teacherForm.joiningDate" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="teacherForm.status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showTeacherModal=false">Cancel</button>
+      <button class="btn btn-primary" (click)="saveTeacher()">{{ isEditMode ? 'Update' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Salary Modal -->
+<div class="modal-overlay" *ngIf="showSalaryModal" (click)="showSalaryModal=false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Pay Salary</h2>
+      <button class="modal-close-btn" (click)="showSalaryModal=false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Teacher *</label>
+          <select class="form-control" [(ngModel)]="salaryForm.teacher" (change)="onSalaryTeacherChange()">
+            <option value="">Select Teacher</option>
+            <option *ngFor="let t of teachers" [value]="t._id">{{ t.name }} — {{ t.subject }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Month *</label>
+          <select class="form-control" [(ngModel)]="salaryForm.month">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Year *</label>
+          <select class="form-control" [(ngModel)]="salaryForm.year">
+            <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Monthly Salary (PKR)</label>
+          <input type="number" class="form-control" [(ngModel)]="salaryForm.amount" (input)="calcNetPaid()" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Advance Deduction (PKR)</label>
+          <input type="number" class="form-control" [(ngModel)]="salaryForm.advance" (input)="calcNetPaid()" />
+        </div>
+        <div class="form-group">
+          <label>Other Deduction (PKR)</label>
+          <input type="number" class="form-control" [(ngModel)]="salaryForm.deduction" (input)="calcNetPaid()" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Net Payable (PKR)</label>
+          <input type="number" class="form-control net-paid" [(ngModel)]="salaryForm.netPaid" readonly />
+        </div>
+        <div class="form-group">
+          <label>Paid On</label>
+          <input type="date" class="form-control" [(ngModel)]="salaryForm.paidOn" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="salaryForm.status">
+            <option value="Paid">Paid</option>
+            <option value="Advance">Advance</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <input class="form-control" [(ngModel)]="salaryForm.note" placeholder="Optional note" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showSalaryModal=false">Cancel</button>
+      <button class="btn btn-primary" (click)="saveSalary()">Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-overlay" *ngIf="showExpenseModal" (click)="showExpenseModal=false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Expense' : 'Add Expense' }}</h2>
+      <button class="modal-close-btn" (click)="showExpenseModal=false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title *</label>
+          <input class="form-control" [(ngModel)]="expenseForm.title" placeholder="e.g. Electricity Bill" />
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select class="form-control" [(ngModel)]="expenseForm.category">
+            <option value="Utilities">Utilities</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount (PKR) *</label>
+          <input type="number" class="form-control" [(ngModel)]="expenseForm.amount" />
+        </div>
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" class="form-control" [(ngModel)]="expenseForm.date" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Paid To</label>
+          <input class="form-control" [(ngModel)]="expenseForm.paidTo" placeholder="Vendor / Person" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input class="form-control" [(ngModel)]="expenseForm.description" placeholder="Details" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showExpenseModal=false">Cancel</button>
+      <button class="btn btn-primary" (click)="saveExpense()">{{ isEditMode ? 'Update' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fee Modal -->
+<div class="modal-overlay" *ngIf="showFeeModal" (click)="showFeeModal=false">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add Fee Collection</h2>
+      <button class="modal-close-btn" (click)="showFeeModal=false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Student *</label>
+          <select class="form-control" [(ngModel)]="feeForm.student">
+            <option value="">Select Student</option>
+            <option *ngFor="let s of students" [value]="s._id">{{ s.name }} — {{ s.admissionNumber }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Month *</label>
+          <select class="form-control" [(ngModel)]="feeForm.month">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Year *</label>
+          <select class="form-control" [(ngModel)]="feeForm.year">
+            <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (PKR) *</label>
+          <input type="number" class="form-control" [(ngModel)]="feeForm.amount" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Paid On</label>
+          <input type="date" class="form-control" [(ngModel)]="feeForm.paidOn" />
+        </div>
+        <div class="form-group">
+          <label>Received By</label>
+          <input class="form-control" [(ngModel)]="feeForm.receivedBy" placeholder="Teacher / Admin name" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="feeForm.status">
+            <option value="Paid">Paid</option>
+            <option value="Partial">Partial</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <input class="form-control" [(ngModel)]="feeForm.note" placeholder="Optional note" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showFeeModal=false">Cancel</button>
+      <button class="btn btn-primary" (click)="saveFee()">Save</button>
+    </div>
+  </div>
+</div>
