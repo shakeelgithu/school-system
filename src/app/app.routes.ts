@@ -4,6 +4,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { StudentsComponent } from './components/students/students.component';
 import { AddStudentComponent } from './add-student/add-student.component';
 import { ClassPromotionComponent } from './class-promotion/class-promotion.component';
+import { PaymentComponent } from './components/payment/payment.component';
 import { AuthGuard } from './auth.guard';
 
 import {PaymentComponent} from './components/payment/payment.component'
