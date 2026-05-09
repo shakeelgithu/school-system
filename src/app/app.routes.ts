@@ -7,7 +7,6 @@ import { ClassPromotionComponent } from './class-promotion/class-promotion.compo
 import { PaymentComponent } from './components/payment/payment.component';
 import { AuthGuard } from './auth.guard';
 
-import {PaymentComponent} from './components/payment/payment.component'
 import {FinanceComponent} from './components/finance/finance.component'
 import {CertificateComponent} from './components/certificate/certificate.component'
 
