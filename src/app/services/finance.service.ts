@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Teacher {
   _id?: string;
@@ -51,7 +52,7 @@ export interface FeeCollection {
 
 @Injectable({ providedIn: 'root' })
 export class FinanceService {
-  private base = 'http://localhost:5000/api/finance';
+ private base = `${environment.apiUrl}/finance`;
 
   constructor(private http: HttpClient) {}
 
