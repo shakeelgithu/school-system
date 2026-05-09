@@ -14,13 +14,6 @@ export class AddStudentComponent {
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
   selectedPhoto: File | null = null;
-<<<<<<< HEAD
-  onPhotoSelected(event: any): void {
-    this.selectedPhoto = event.target.files[0];
-  }
-
-  onSubmit(): void {
-=======
   photoPreview: string | null = null;
   showCamera: boolean = false;
 
@@ -108,7 +101,6 @@ export class AddStudentComponent {
       alert('Please take a photo before submitting.');
       return;
     }
->>>>>>> 2961302 (pending chagnes push)
     alert('Form submitted successfully!');
   }
 

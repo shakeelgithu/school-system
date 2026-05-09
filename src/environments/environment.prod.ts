@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://your-production-api.com/api' // Replace with your production URL
+    apiUrl: 'https://school-managment-b.vercel.app/api' 
   };
